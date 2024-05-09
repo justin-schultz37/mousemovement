@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keep Awake</title>
+    <script>
+        // Function to move the mouse cursor
+        function moveMouse() {
+            // Calculate the new mouse coordinates
+            var newX = Math.random() * window.innerWidth;
+            var newY = Math.random() * window.innerHeight;
+
+            // Move the mouse cursor
+            window.scrollTo(newX, newY);
+
+            // Log the interval timer count
+            console.log('Mouse moved. Interval timer count:', new Date().toLocaleTimeString());
+        }
+
+        // Call the moveMouse function at regular intervals
+        setInterval(moveMouse, 30000); // Move the mouse every 30 seconds
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
