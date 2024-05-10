@@ -5,26 +5,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Keep Awake</title>
+    <style>
+        .green-button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+    </style>
     <script>
-        // Function to move the mouse cursor
-        function moveMouse() {
-            // Calculate the new mouse coordinates
-            var newX = Math.random() * window.innerWidth;
-            var newY = Math.random() * window.innerHeight;
+        var startCoordinate = null;
+        var endCoordinate = null;
+        var isStartCoordinateActive = true;
+        var toggleInterval;
+        var count = 0;
 
-            // Move the mouse cursor
-            window.scrollTo(newX, newY);
+        // Function to move the mouse cursor and click the coordinate
+        function moveMouseAndClick(x, y) {
+            // Move the mouse cursor to specified coordinates
+            window.scrollTo(x, y);
 
-            // Log the interval timer count
-            console.log('Mouse moved. Interval timer count:', new Date().toLocaleTimeString());
+            // Create a mouse click event
+            var clickEvent = new MouseEvent('click', {
+                'view': window,
+                'bubbles': true,
+                'cancelable': true
+            });
+
+            // Dispatch the click event at the specified coordinates
+            var element = document.elementFromPoint(x, y);
+            if (element) {
+                element.dispatchEvent(clickEvent);
+            }
+
+            // Log the movement and click
+            console.log('Mouse moved to (' + x + ', ' + y + ') and clicked.');
         }
 
-        // Call the moveMouse function at regular intervals
-        setInterval(moveMouse, 30000); // Move the mouse every 30 seconds
+        // Function to toggle between start and end coordinates
+        function toggleCoordinates() {
+            if (isStartCoordinateActive) {
+                moveMouseAndClick(endCoordinate.x, endCoordinate.y);
+                isStartCoordinateActive = false;
+            } else {
+                moveMouseAndClick(startCoordinate.x, startCoordinate.y);
+                isStartCoordinateActive = true;
+            }
+        }
+
+        // Function to handle setting the start coordinate
+        function setStartCoordinate() {
+            count++;
+            updateCounter();
+            document.removeEventListener('click', handleStartCoordinateClick);
+            document.addEventListener('click', handleStartCoordinateClick);
+        }
+
+        // Function to handle setting the end coordinate
+        function setEndCoordinate() {
+            count--;
+            updateCounter();
+            document.removeEventListener('click', handleEndCoordinateClick);
+            document.addEventListener('click', handleEndCoordinateClick);
+
+            // Start toggling between coordinates
+            toggleInterval = setInterval(toggleCoordinates, 3000); // Toggle every 3 seconds
+        }
+
+        // Function to handle mouse click events for setting the start coordinate
+        function handleStartCoordinateClick(event) {
+            var x = event.clientX;
+            var y = event.clientY;
+
+            startCoordinate = { x: x, y: y };
+            console.log('Start coordinate set:', startCoordinate);
+
+            // Remove the event listener and reset to handle regular mouse clicks
+            document.removeEventListener('click', handleStartCoordinateClick);
+            document.addEventListener('click', handleMouseClick);
+        }
+
+        // Function to handle mouse click events for setting the end coordinate
+        function handleEndCoordinateClick(event) {
+            var x = event.clientX;
+            var y = event.clientY;
+
+            endCoordinate = { x: x, y: y };
+            console.log('End coordinate set:', endCoordinate);
+
+            // Remove the event listener and reset to handle regular mouse clicks
+            document.removeEventListener('click', handleEndCoordinateClick);
+            document.addEventListener('click', handleMouseClick);
+        }
+
+        // Function to handle mouse click events
+        function handleMouseClick(event) {
+            // This function can be left empty as it's not needed for this functionality
+        }
+
+        // Function to update the counter display
+        function updateCounter() {
+            document.getElementById('counter').innerText = count;
+        }
     </script>
 </head>
 
 <body>
+    <button class="green-button" onclick="setStartCoordinate()">Start</button>
+    <button class="green-button" onclick="setEndCoordinate()">End</button>
+    <p>Counter: <span id="counter">0</span></p>
 </body>
 
 </html>
