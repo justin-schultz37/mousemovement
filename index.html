@@ -17,11 +17,11 @@
         }
     </style>
     <script>
-        var startCoordinate = null;
-        var endCoordinate = null;
-        var isStartCoordinateActive = true;
-        var toggleInterval;
-        var count = 0;
+        let startCoordinate = null;
+        let endCoordinate = null;
+        let isStartCoordinateActive = true;
+        let toggleInterval;
+        let count = 0;
 
         // Function to move the mouse cursor and click the coordinate
         function moveMouseAndClick(x, y) {
@@ -29,14 +29,14 @@
             window.scrollTo(x, y);
 
             // Create a mouse click event
-            var clickEvent = new MouseEvent('click', {
+            const clickEvent = new MouseEvent('click', {
                 'view': window,
                 'bubbles': true,
                 'cancelable': true
             });
 
             // Dispatch the click event at the specified coordinates
-            var element = document.elementFromPoint(x, y);
+            const element = document.elementFromPoint(x, y);
             if (element) {
                 element.dispatchEvent(clickEvent);
             }
@@ -47,68 +47,85 @@
 
         // Function to toggle between start and end coordinates
         function toggleCoordinates() {
+            console.log('Toggling coordinates...');
             if (isStartCoordinateActive) {
-                moveMouseAndClick(endCoordinate.x, endCoordinate.y);
-                isStartCoordinateActive = false;
+                if (endCoordinate) {
+                    moveMouseAndClick(endCoordinate.x, endCoordinate.y);
+                }
             } else {
-                moveMouseAndClick(startCoordinate.x, startCoordinate.y);
-                isStartCoordinateActive = true;
+                if (startCoordinate) {
+                    moveMouseAndClick(startCoordinate.x, startCoordinate.y);
+                }
             }
         }
 
         // Function to handle setting the start coordinate
         function setStartCoordinate() {
+            console.log('Setting start coordinate...');
             count++;
             updateCounter();
             document.removeEventListener('click', handleStartCoordinateClick);
+            document.removeEventListener('click', handleEndCoordinateClick);
+            clearInterval(toggleInterval);
+            checkStartToggling();
+            // Re-add event listener for setting start coordinate
             document.addEventListener('click', handleStartCoordinateClick);
         }
 
         // Function to handle setting the end coordinate
         function setEndCoordinate() {
+            console.log('Setting end coordinate...');
             count--;
             updateCounter();
             document.removeEventListener('click', handleEndCoordinateClick);
+            document.removeEventListener('click', handleStartCoordinateClick);
+            clearInterval(toggleInterval);
+            checkStartToggling();
+            // Re-add event listener for setting end coordinate
             document.addEventListener('click', handleEndCoordinateClick);
-
-            // Start toggling between coordinates
-            toggleInterval = setInterval(toggleCoordinates, 3000); // Toggle every 3 seconds
         }
 
         // Function to handle mouse click events for setting the start coordinate
         function handleStartCoordinateClick(event) {
-            var x = event.clientX;
-            var y = event.clientY;
+            const x = event.clientX;
+            const y = event.clientY;
 
             startCoordinate = { x: x, y: y };
             console.log('Start coordinate set:', startCoordinate);
 
-            // Remove the event listener and reset to handle regular mouse clicks
-            document.removeEventListener('click', handleStartCoordinateClick);
-            document.addEventListener('click', handleMouseClick);
+            setStartCoordinate();
         }
 
         // Function to handle mouse click events for setting the end coordinate
         function handleEndCoordinateClick(event) {
-            var x = event.clientX;
-            var y = event.clientY;
+            const x = event.clientX;
+            const y = event.clientY;
 
             endCoordinate = { x: x, y: y };
             console.log('End coordinate set:', endCoordinate);
 
-            // Remove the event listener and reset to handle regular mouse clicks
-            document.removeEventListener('click', handleEndCoordinateClick);
-            document.addEventListener('click', handleMouseClick);
-        }
-
-        // Function to handle mouse click events
-        function handleMouseClick(event) {
-            // This function can be left empty as it's not needed for this functionality
+            setEndCoordinate();
         }
 
         // Function to update the counter display
         function updateCounter() {
             document.getElementById('counter').innerText = count;
+        }
+
+        // Function to start toggling between coordinates
+        function startToggling() {
+            console.log('Starting toggling...');
+            toggleInterval = setInterval(function () {
+                isStartCoordinateActive = !isStartCoordinateActive;
+                toggleCoordinates();
+            }, 3000); // Toggle every 3 seconds
+        }
+
+        // Function to check if both start and end coordinates are set before starting toggling
+        function checkStartToggling() {
+            if (startCoordinate && endCoordinate) {
+                startToggling();
+            }
         }
     </script>
 </head>
